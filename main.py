@@ -1,6 +1,7 @@
 import re
 from tokenizer.simple_tokenizer_v1 import SimpleTokenizerV1
 from tokenizer.simple_tokenizer_v2 import SimpleTokenizerV2
+import tiktoken
 
 
 def read_file(text_file: str) -> str:
@@ -24,16 +25,15 @@ def main():
     raw_text = read_file("data/the-verdict.txt")
 
     vocab = create_vocabulary(raw_text)
-    print("Len of Vocab: ", len(vocab))
 
-    tokenizer = SimpleTokenizerV2(vocab)
+    tokenizer = tiktoken.get_encoding("gpt2")
 
     text1 = "Hello, do you like tea?"
     text2 = "In the sunlit terraces of the palace."
     text = " <|endoftext|> ".join((text1, text2))
     print(text)
 
-    ids = tokenizer.encode(text)
+    ids = tokenizer.encode(text, allowed_special={"<|endoftext|>"})
     print(ids)
 
     print(tokenizer.decode(ids))

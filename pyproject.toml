@@ -7,7 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "torch==2.6",
     "jupyterlab>=4.0",
-    "tiktoken>=0.5.1",
+    "tiktoken==0.7.0",
     "matplotlib>=3.7.1",
     "tqdm>=4.66.1",
     "numpy>=1.26",

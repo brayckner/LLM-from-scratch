@@ -1,26 +1,37 @@
 import re
 from tokenizer.simple_tokenizer_v1 import SimpleTokenizerV1
+from tokenizer.simple_tokenizer_v2 import SimpleTokenizerV2
 
 
-def read_file(text_file: str):
+def read_file(text_file: str) -> str:
     with open(f"{text_file}", "r", encoding="utf-8") as f:
         raw_text = f.read()
     return raw_text
+
+
+def create_vocabulary(text: str):
+    preprocessed = re.split(r'([,.:;?_!"()\']|--|\s)', text)
+    preprocessed = [item.strip() for item in preprocessed if item.strip()]
+    all_words = sorted(set(preprocessed))
+
+    # Adding special characters: unk and endoftext
+    all_words.extend(["<|endoftext|>", "<|unk|>"])
+    return {token: integer for integer, token in enumerate(all_words)}
 
 
 def main():
 
     raw_text = read_file("data/the-verdict.txt")
 
-    preprocessed = re.split(r'([,.:;?_!"()\']|--|\s)', raw_text)
-    preprocessed = [item.strip() for item in preprocessed if item.strip()]
-    all_words = sorted(set(preprocessed))
-    vocab = {token: integer for integer, token in enumerate(all_words)}
+    vocab = create_vocabulary(raw_text)
+    print("Len of Vocab: ", len(vocab))
 
-    tokenizer = SimpleTokenizerV1(vocab)
+    tokenizer = SimpleTokenizerV2(vocab)
 
-    text = """It's the last he painted, you know,
-            Mrs.Gisburn said with pardonable pride."""
+    text1 = "Hello, do you like tea?"
+    text2 = "In the sunlit terraces of the palace."
+    text = " <|endoftext|> ".join((text1, text2))
+    print(text)
 
     ids = tokenizer.encode(text)
     print(ids)

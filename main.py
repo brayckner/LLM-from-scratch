@@ -1,6 +1,7 @@
 import re
 from tokenizer.simple_tokenizer_v1 import SimpleTokenizerV1
 from tokenizer.simple_tokenizer_v2 import SimpleTokenizerV2
+from gpt_dataset.gpt_dataset_v1 import GPTDatasetV1, create_dataloader_v1
 import tiktoken
 
 
@@ -22,21 +23,57 @@ def create_vocabulary(text: str):
 
 def main():
 
+    # Tokenization
     raw_text = read_file("data/the-verdict.txt")
 
-    vocab = create_vocabulary(raw_text)
+    # tokenizer = tiktoken.get_encoding("gpt2")  # Utilizing BPE tokenizer, same as GPT-2
 
-    tokenizer = tiktoken.get_encoding("gpt2")
+    # enc_text = tokenizer.encode(raw_text)
+    # print(len(enc_text))
 
-    text1 = "Hello, do you like tea?"
-    text2 = "In the sunlit terraces of the palace."
-    text = " <|endoftext|> ".join((text1, text2))
-    print(text)
+    # # Tokens to input-target pairs
+    # enc_sample = enc_text[50:]
 
-    ids = tokenizer.encode(text, allowed_special={"<|endoftext|>"})
-    print(ids)
+    # context_size = 4
+    # x = enc_sample[:context_size]
+    # y = enc_sample[1 : context_size + 1]
 
-    print(tokenizer.decode(ids))
+    # print(f"x: {x}")  # Inputs
+    # print(f"y:      {y}")  # Targets
+
+    # # Next word prediction task (using tokenIDs)
+    # for i in range(1, context_size + 1):
+    #     context = enc_sample[:i]
+    #     desired = enc_sample[i]
+    #     print(context, "----->", desired)
+
+    # # Next word prediction task (using words for visual)
+    # for i in range(1, context_size + 1):
+    #     context = enc_sample[:i]
+    #     desired = enc_sample[i]
+    #     print(tokenizer.decode(context), "----->", tokenizer.decode([desired]))
+
+    # Batch Size 1
+    dataloader = create_dataloader_v1(
+        raw_text, batch_size=1, max_length=4, stride=1, shuffle=False
+    )
+    data_iter = iter(dataloader)
+
+    first_batch = next(data_iter)
+    print(first_batch)
+
+    second_batch = next(data_iter)
+    print(second_batch)
+
+    # Batch Size 8
+    dataloader = create_dataloader_v1(
+        raw_text, batch_size=8, max_length=4, stride=4, shuffle=False
+    )
+    data_iter = iter(dataloader)
+    inputs, targets = next(data_iter)
+
+    print("Inputs:\n", inputs)
+    print("\nTargets:\n", targets)
 
 
 if __name__ == "__main__":
